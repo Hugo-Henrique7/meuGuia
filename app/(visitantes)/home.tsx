@@ -6,9 +6,11 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import type { Business, Category } from "../../src/types/models";
+import Carrossel from "./business/carrossel";
 import {
   fetchCategories,
   fetchFeaturedBusinesses,
@@ -53,110 +55,58 @@ export default function HomePublic() {
     return featured.filter((b) => (b.name || "").toLowerCase().includes(s));
   }, [featured, search]);
 
+
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: "#0b1220" }}
-      contentContainerStyle={{ padding: 16 }}
-    >
-      <View style={{ marginTop: 24, marginBottom: 16 }}>
-        <Text style={{ color: "#fff", fontSize: 22, fontWeight: "700" }}>
-          Itajuípe - BA
-        </Text>
-        <Text style={{ color: "#9fb3c8", marginTop: 4 }}>
-          Comércios locais em destaque
-        </Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Carrossel></Carrossel>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Itajuípe - BA</Text>
+        <Text style={styles.headerSubtitle}>Comércios locais em destaque</Text>
       </View>
 
-      <View
-        style={{
-          backgroundColor: "#111b2e",
-          borderRadius: 14,
-          padding: 12,
-          marginBottom: 16,
-        }}
-      >
+      <View style={styles.searchBox}>
         <TextInput
           value={search}
           onChangeText={setSearch}
           placeholder="Buscar comércio ou serviço"
           placeholderTextColor="#6c7f99"
-          style={{ color: "#fff" }}
+          style={styles.searchInput}
         />
       </View>
 
       {loading ? (
-        <View style={{ paddingVertical: 20 }}>
+        <View style={styles.loading}>
           <ActivityIndicator />
-          <Text style={{ color: "#9fb3c8", marginTop: 8 }}>
-            Carregando dados...
-          </Text>
+          <Text style={styles.loadingText}>Carregando dados...</Text>
         </View>
       ) : (
         <>
-          <Text
-            style={{
-              color: "#fff",
-              fontSize: 16,
-              fontWeight: "700",
-              marginBottom: 10,
-            }}
-          >
-            Categorias
-          </Text>
+          <Text style={styles.sectionTitle}>Categorias</Text>
 
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 10,
-              flexWrap: "wrap",
-              marginBottom: 18,
-            }}
-          >
+          <View style={styles.categoriesContainer}>
             {categories.map((c) => (
               <Pressable
                 key={c.id}
-                style={{
-                  backgroundColor: "#111b2e",
-                  padding: 12,
-                  borderRadius: 14,
-                  width: "48%",
-                }}
+                style={styles.categoryCard}
                 onPress={() => {
-                  // depois a gente cria a tela de listagem por categoria
                   console.log("Categoria:", c.name, c.id);
                 }}
               >
-                <Text style={{ color: "#fff", fontWeight: "600" }}>
-                  {c.name}
-                </Text>
+                <Text style={styles.categoryText}>{c.name}</Text>
               </Pressable>
             ))}
           </View>
 
-          <Text
-            style={{
-              color: "#fff",
-              fontSize: 16,
-              fontWeight: "700",
-              marginBottom: 10,
-            }}
-          >
-            Comércios em destaque
-          </Text>
+          <Text style={styles.sectionTitle}>Comércios em destaque</Text>
 
           {filteredFeatured.map((b) => (
             <Pressable
               key={b.id}
               onPress={() => router.push(`/(visitantes)/business/${b.id}`)}
-              style={{
-                backgroundColor: "#111b2e",
-                padding: 14,
-                borderRadius: 14,
-                marginBottom: 14,
-              }}
+              style={styles.businessCard}
             >
-              <Text style={{ color: "#fff", fontWeight: "800" }}>{b.name}</Text>
-              <Text style={{ color: "#9fb3c8", marginTop: 4 }}>
+              <Text style={styles.businessName}>{b.name}</Text>
+              <Text style={styles.businessAddress}>
                 {(b.address || "").slice(0, 60)}
               </Text>
             </Pressable>
@@ -164,19 +114,98 @@ export default function HomePublic() {
 
           <Pressable
             onPress={() => router.push("/(comerciantes)/login")}
-            style={{
-              backgroundColor: "#ff8a3d",
-              padding: 14,
-              borderRadius: 14,
-              alignItems: "center",
-            }}
+            style={styles.loginButton}
           >
-            <Text style={{ color: "#111", fontWeight: "800" }}>
-              Acessar painel
-            </Text>
+            <Text style={styles.loginText}>Acessar painel</Text>
           </Pressable>
         </>
       )}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#0b1220",
+  },
+  content: {
+    padding: 16,
+  },
+  header: {
+    marginTop: 24,
+    marginBottom: 16,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  headerSubtitle: {
+    color: "#9fb3c8",
+    marginTop: 4,
+  },
+  searchBox: {
+    backgroundColor: "#111b2e",
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 16,
+  },
+  searchInput: {
+    color: "#fff",
+  },
+  loading: {
+    paddingVertical: 20,
+    alignItems: "center",
+  },
+  loadingText: {
+    color: "#9fb3c8",
+    marginTop: 8,
+  },
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 10,
+  },
+  categoriesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 18,
+  },
+  categoryCard: {
+    backgroundColor: "#111b2e",
+    padding: 12,
+    borderRadius: 14,
+    width: "48%",
+  },
+  categoryText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  businessCard: {
+    backgroundColor: "#111b2e",
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 14,
+  },
+  businessName: {
+    color: "#fff",
+    fontWeight: "800",
+  },
+  businessAddress: {
+    color: "#9fb3c8",
+    marginTop: 4,
+  },
+  loginButton: {
+    backgroundColor: "#ff8a3d",
+    padding: 14,
+    borderRadius: 14,
+    alignItems: "center",
+  },
+  loginText: {
+    color: "#111",
+    fontWeight: "800",
+  },
+});
